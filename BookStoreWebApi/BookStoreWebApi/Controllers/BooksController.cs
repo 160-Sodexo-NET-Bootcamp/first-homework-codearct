@@ -12,7 +12,7 @@ namespace BookStoreWebApi.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        public List<Book> books;
+        private readonly List<Book> books;
         public BooksController()
         {
             books = new List<Book>()
@@ -75,33 +75,104 @@ namespace BookStoreWebApi.Controllers
                 }
             };
         }
-        /*[HttpGet]
+
+        [HttpGet]
         public ActionResult<List<Book>> GetAll()
         {
             return books;
-        }*/
+        }
 
-        /*[HttpGet("{id}")]
+        [HttpGet("{id}")]
         public ActionResult<Book> GetByIdFromRoute(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Geçerli bir Id giriniz");
+            }
+
             var book = books.Where(b => b.Id == id).SingleOrDefault();
+
             if (book is null)
             {
                 return NotFound("Kitap bulunamadı");
             }
             return book;
-        }*/
-        [HttpGet]
+        }
+
+        /*[HttpGet]
         public IActionResult GetByIdFromQuery([FromQuery] int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest("Geçerli bir Id giriniz");
+            }
+
             var book = books.Where(b => b.Id == id).SingleOrDefault();
+
             if (book is null)
             {
                 return BadRequest("Kitap bulunamadı");
             }
             return Ok(book);
 
+        }*/
+
+        [HttpPost]
+        public IActionResult Add([FromBody] Book book)
+        {
+            books.Add(book);
+
+            return Ok($"\"{book.Title}\" adlı kitap eklendi");
+            //return Ok(books);eklenen kitabın da olduğu listeyi döndürmek istersek...
         }
 
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, [FromBody] Book model)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Geçerli bir Id giriniz");
+            }
+
+            var book = books.Where(b => b.Id == id).SingleOrDefault();
+
+            if (book is null)
+            {
+                return BadRequest("Kitap bulunamadı");
+            }
+
+            book.Id = model.Id == default ? book.Id : model.Id;
+            book.Title = string.IsNullOrEmpty(model.Title) ? book.Title : model.Title;
+            book.Author = string.IsNullOrEmpty(model.Author) ? book.Author : model.Author;
+            book.Translator = string.IsNullOrEmpty(model.Translator) ? book.Translator : model.Translator;
+            book.Publisher = string.IsNullOrEmpty(model.Publisher) ? book.Publisher : model.Publisher;
+            book.PageNumbers = model.PageNumbers == default ? book.PageNumbers : model.PageNumbers;
+            book.Description = string.IsNullOrEmpty(model.Description) ? book.Description : model.Description;
+
+            return Ok($"\"{book.Title}\" adlı kitap güncellendi");
+            //return Ok(books);güncellenen kitap bilgilerinin olduğu listeyi döndürmek istersek...
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Remove(int id)
+        {
+            if (id<=0)
+            {
+                return BadRequest("Geçerli bir Id giriniz");
+            }
+
+            var book = books.Where(b => b.Id == id).SingleOrDefault();
+
+            if (book is null)
+            {
+                return NotFound("Kİtap bulunamadı");
+            }
+
+            books.Remove(book);
+
+            return Ok($"\"{book.Title}\" adlı kitap kaldırıldı");
+            //return Ok(books); silinen kitabın olmadığı listeyi döndürmek istersek...
+            
+        }
     }
 }
