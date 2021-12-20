@@ -82,6 +82,12 @@ namespace BookStoreWebApi.Controllers
             return books;
         }
 
+        /*[HttpPost]
+        public ActionResult<List<Book>> GetAll()
+        {
+            return books;
+        }*/
+
         [HttpGet("{id}")]
         public ActionResult<Book> GetByIdFromRoute(int id)
         {
